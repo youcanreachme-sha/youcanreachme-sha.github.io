@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Timer</title>
+    <title>Countdown Timer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,62 +14,74 @@
             margin: 0;
             background-color: #f0f0f0;
         }
-        #timer {
+        #countdown {
             font-size: 48px;
             font-weight: bold;
+            text-align: center;
         }
-        button {
+        .time-unit {
+            display: inline-block;
+            margin: 0 10px;
+        }
+        .time-value {
+            font-size: 60px;
+        }
+        .time-label {
             font-size: 18px;
-            margin: 10px;
-            padding: 10px 20px;
-            cursor: pointer;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div>
-        <div id="timer">00:00:00</div>
-        <button onclick="startTimer()">Start</button>
-        <button onclick="stopTimer()">Stop</button>
-        <button onclick="resetTimer()">Reset</button>
+    <div id="countdown">
+        <div class="time-unit">
+            <div class="time-value" id="days">00</div>
+            <div class="time-label">Days</div>
+        </div>
+        <div class="time-unit">
+            <div class="time-value" id="hours">00</div>
+            <div class="time-label">Hours</div>
+        </div>
+        <div class="time-unit">
+            <div class="time-value" id="minutes">00</div>
+            <div class="time-label">Minutes</div>
+        </div>
+        <div class="time-unit">
+            <div class="time-value" id="seconds">00</div>
+            <div class="time-label">Seconds</div>
+        </div>
     </div>
 
     <script>
-        let timer;
-        let isRunning = false;
-        let seconds = 0;
+        // Set the date we're counting down to
+        const countDownDate = new Date("Jan 1, 2025 00:00:00").getTime();
 
-        function startTimer() {
-            if (!isRunning) {
-                isRunning = true;
-                timer = setInterval(updateTimer, 1000);
+        // Update the countdown every 1 second
+        const timer = setInterval(function() {
+            // Get today's date and time
+            const now = new Date().getTime();
+
+            // Find the distance between now and the countdown date
+            const distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result
+            document.getElementById("days").textContent = pad(days);
+            document.getElementById("hours").textContent = pad(hours);
+            document.getElementById("minutes").textContent = pad(minutes);
+            document.getElementById("seconds").textContent = pad(seconds);
+
+            // If the countdown is finished, display some text
+            if (distance < 0) {
+                clearInterval(timer);
+                document.getElementById("countdown").innerHTML = "EXPIRED";
             }
-        }
-
-        function stopTimer() {
-            isRunning = false;
-            clearInterval(timer);
-        }
-
-        function resetTimer() {
-            stopTimer();
-            seconds = 0;
-            updateDisplay();
-        }
-
-        function updateTimer() {
-            seconds++;
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-
-            const display = `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
-            document.getElementById('timer').textContent = display;
-        }
+        }, 1000);
 
         function pad(num) {
             return num.toString().padStart(2, '0');
